@@ -1,1 +1,385 @@
-<html></html>
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mizan</title>
+<style>
+:root {
+  --paper: #f7f2e8; --card: #fbf8f1; --ink: #2a2522; --muted: #8a8079; --faint: #b8aea3;
+  --line: #e7dfd1; --wine: #6e1f2a; --wine-soft: #b98a90; --gold: #b08d4c; --stone: #a49a90;
+  --up: #3f5f4a; --down: #9b3a3a;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --sans: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  --r: 16px;
+}
+* { box-sizing: border-box; }
+html { background: var(--paper); }
+body { margin: 0; color: var(--ink); font: 15px/1.55 var(--sans); -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0; }
+input { font: inherit; color: inherit; }
+.num { font-variant-numeric: tabular-nums; }
+.serif { font-family: var(--serif); }
+
+header { position: sticky; top: 0; z-index: 5; background: rgba(247, 242, 232, .9); backdrop-filter: blur(10px); }
+.bar { max-width: 1040px; margin: 0 auto; padding: 22px 32px 18px; display: flex; align-items: center; justify-content: space-between; }
+.brand { font: 600 12px/1 var(--sans); letter-spacing: .34em; color: var(--wine); }
+.rule { max-width: 1040px; margin: 0 auto; border-bottom: 1px solid var(--line); }
+
+main { max-width: 1040px; margin: 0 auto; padding: 40px 32px 96px; }
+
+.eyebrow { font-size: 12px; letter-spacing: .06em; color: var(--muted); }
+h1 { font: 400 44px/1.1 var(--serif); margin: 10px 0 0; letter-spacing: -.01em; }
+h2 { font: 400 22px/1.2 var(--serif); margin: 0; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 28px; }
+.stack > * + * { margin-top: 20px; }
+.head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+.grid { display: grid; gap: 14px; }
+.g3 { grid-template-columns: repeat(3, 1fr); }
+.g2 { grid-template-columns: repeat(2, 1fr); }
+.gauto { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px; background: var(--card); }
+.seg button { padding: 7px 16px; border-radius: 999px; font-size: 13px; color: var(--muted); transition: background .25s var(--ease), color .25s var(--ease); }
+.seg button.on { background: var(--wine); color: var(--paper); }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 13px 26px; border-radius: 999px;
+  background: var(--wine); color: var(--paper); font-size: 14px; letter-spacing: .02em;
+  transition: transform .2s var(--ease), opacity .2s var(--ease); }
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn[disabled] { opacity: .45; pointer-events: none; }
+
+.amount { display: flex; align-items: baseline; gap: 10px; border-bottom: 1px solid var(--gold); padding-bottom: 6px; max-width: 340px; }
+.amount input { border: 0; background: none; outline: none; font: 400 28px/1 var(--serif); width: 100%; font-variant-numeric: tabular-nums; }
+.warn { font-size: 13px; min-height: 18px; margin-top: 10px; }
+
+.hero { padding: 6px 0 34px; border-bottom: 1px solid var(--gold); margin-bottom: 28px; }
+.value { font: 400 64px/1.05 var(--serif); margin: 14px 0 10px; letter-spacing: -.015em; font-variant-numeric: tabular-nums; }
+.delta { font-size: 15px; font-variant-numeric: tabular-nums; }
+.up { color: var(--up); } .down { color: var(--down); }
+.status { font-size: 13px; color: var(--muted); margin-top: 8px; }
+.switch-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.hold { border: 1px solid var(--line); border-radius: 14px; padding: 18px; background: var(--paper); }
+.hold .sym { font-size: 13px; font-weight: 600; letter-spacing: .02em; }
+.hold .code { font-weight: 400; color: var(--muted); margin-left: 6px; }
+.hold .val { font: 400 23px/1.2 var(--serif); margin: 8px 0 12px; font-variant-numeric: tabular-nums; }
+.meter { height: 3px; background: var(--line); border-radius: 2px; overflow: hidden; }
+.meter i { display: block; height: 100%; background: var(--wine); }
+.hold .sub { font-size: 12px; color: var(--muted); margin-top: 8px; font-variant-numeric: tabular-nums; }
+footer.meta { margin-top: 26px; font-size: 12px; color: var(--muted); display: flex; gap: 6px 22px; flex-wrap: wrap; }
+
+.chart { position: relative; }
+.chart svg { width: 100%; height: auto; display: block; overflow: visible; }
+.chart svg text { font: 11px var(--sans); fill: var(--muted); }
+.chart .tip { position: absolute; pointer-events: none; background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+  padding: 10px 12px; font-size: 12px; min-width: 150px; opacity: 0; transition: opacity .15s var(--ease); box-shadow: 0 6px 24px rgba(42,37,34,.06); }
+.chart .tip.on { opacity: 1; }
+.chart .tip div { display: flex; justify-content: space-between; gap: 14px; font-variant-numeric: tabular-nums; }
+.legend { display: flex; gap: 8px 22px; flex-wrap: wrap; font-size: 13px; color: var(--muted); margin-top: 14px; }
+.legend i { display: inline-block; width: 18px; height: 0; border-top: 2px solid; vertical-align: middle; margin-right: 8px; }
+
+.order { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 16px; padding: 18px 20px;
+  border: 1px solid var(--line); border-radius: 14px; background: var(--paper); }
+.order .side { font-size: 12px; font-weight: 600; letter-spacing: .04em; width: 34px; }
+.order .side.Al { color: var(--up); } .order .side.Sat { color: var(--down); }
+.order .code { font: 400 20px/1.2 var(--serif); }
+.order .what { font-size: 12px; color: var(--muted); }
+.order .amt { text-align: right; font: 400 18px/1.2 var(--serif); font-variant-numeric: tabular-nums; }
+.order .amt small { display: block; font: 12px var(--sans); color: var(--muted); }
+.order.done { opacity: .45; }
+.tick { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--faint); display: grid; place-items: center; }
+.tick svg { width: 12px; height: 12px; stroke: var(--paper); stroke-width: 2.2; fill: none; opacity: 0; }
+.order.done .tick { background: var(--wine); border-color: var(--wine); }
+.order.done .tick svg { opacity: 1; }
+.order.with-tick { grid-template-columns: auto auto 1fr auto; }
+.empty { text-align: center; padding: 64px 20px; }
+.empty .serif { font-size: 28px; }
+
+@media (max-width: 760px) {
+  .bar { padding: 16px 16px 14px; }
+  main { padding: 28px 16px 72px; }
+  .g3, .g2 { grid-template-columns: 1fr; }
+  .value { font-size: 46px; }
+  h1 { font-size: 34px; }
+  .card { padding: 22px 18px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="brand">MİZAN</div>
+  </div>
+  <div class="rule"></div>
+</header>
+
+<main>
+  <div class="login-wrap" id="loginWrap" style="min-height: 60vh; display: grid; place-items: center; text-align: center;">
+    <form id="loginForm" style="width: min(320px, 90vw);">
+      <h1 class="serif" style="margin-bottom: 24px;">Mizan</h1>
+      <div class="amount" style="max-width: 100%; margin: 0 auto; justify-content: center;">
+        <input id="pwd" type="password" placeholder="Şifre" style="text-align: center; padding: 6px 0;" autocomplete="current-password" autofocus>
+      </div>
+      <div id="pwdErr" class="warn" style="color: var(--down); margin: 12px 0 0;"></div>
+      <div style="margin-top: 26px;">
+        <button type="submit" class="btn" style="width: 100%;" id="btnOpen">Aç</button>
+      </div>
+    </form>
+  </div>
+  <div id="app" style="display: none;"></div>
+</main>
+
+<script>
+"use strict";
+const PAYLOAD = {"salt": "SyOK62ZOHtftvhOWfVjZdA==", "iv": "i0BrJ15p7ZaK1ldU", "data": "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"};
+const $ = s => document.querySelector(s);
+const nf0 = new Intl.NumberFormat("tr-TR", { maximumFractionDigits: 0 });
+const nf2 = new Intl.NumberFormat("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const tl = (x, d = 0) => (d ? nf2 : nf0).format(x) + " TL";
+const usd = x => "$" + nf0.format(x);
+const pct = (x, sign = false) => x == null ? "–" : (x < 0 ? "-" : sign && x > 0 ? "+" : "") + "%" + Math.abs(x * 100).toFixed(1).replace(".", ",");
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+const S = { state: null, mode: null, cur: "tl" };
+
+const MONTHS = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
+function fmtDate(d, long) { const [y, m, dd] = d.split("-"); return long ? `${+dd} ${MONTHS[m - 1]} ${y}` : `${+dd}.${m}.${y.slice(2)}`; }
+function legend(styles, names) {
+  return `<div class="legend">${names.map(k => { const s = styles[k] || {}; return `<span><i style="border-color:${s.c};${s.d ? "border-top-style:dashed" : ""}"></i>${esc(k)}</span>`; }).join("")}</div>`;
+}
+const STY = {
+  "Mizan": { c: "var(--wine)", w: 2.4 }, "Dengeli": { c: "var(--wine)", w: 2.4 },
+  "Temkinli": { c: "var(--wine-soft)", w: 1.8 }, "Atak": { c: "var(--ink)", w: 1.6 },
+  "Altın": { c: "var(--gold)", w: 1.6 }, "Para fonu": { c: "var(--stone)", w: 1.4, d: "5 5" },
+  "BIST 100": { c: "var(--faint)", w: 1.2, d: "2 4" },
+};
+
+function drawChart(el, data, styles, opts = {}) {
+  const names = Object.keys(data.series).filter(k => data.series[k] && data.series[k].length);
+  const n = data.dates.length; if (n < 2 || !names.length) { el.innerHTML = ""; return; }
+  const W = 960, H = opts.h || 300, P = { l: 4, r: 74, t: 12, b: 26 };
+  const f = v => Math.log(v);
+  let lo = Infinity, hi = -Infinity;
+  names.forEach(k => data.series[k].forEach(v => { if (v > 0) { lo = Math.min(lo, f(v)); hi = Math.max(hi, f(v)); } }));
+  const pad = (hi - lo) * .08 || .01; lo -= pad; hi += pad;
+  const x = i => P.l + (W - P.l - P.r) * i / (n - 1);
+  const y = v => P.t + (H - P.t - P.b) * (1 - (f(v) - lo) / (hi - lo));
+  let g = "";
+  for (let k = 0; k <= 3; k++) {
+    const v = Math.exp(lo + (hi - lo) * (k + .5) / 4);
+    g += `<line x1="${P.l}" x2="${W - P.r}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/>`;
+    g += `<text x="${W - P.r + 10}" y="${y(v) + 4}">${opts.fmt ? opts.fmt(v) : nf0.format(v)}</text>`;
+  }
+  const yrs = []; let last = "";
+  data.dates.forEach((d, i) => { const yy = d.slice(0, 4); if (yy !== last) { if (i > n * .04) yrs.push([i, yy]); last = yy; } });
+  const ticks = yrs.length > 1 ? yrs : [[0, fmtDate(data.dates[0])], [n - 1, fmtDate(data.dates[n - 1])]];
+  ticks.forEach(([i, t], j) => g += `<text x="${x(i)}" y="${H - 6}" text-anchor="${yrs.length > 1 ? "middle" : (j ? "end" : "start")}">${t}</text>`);
+  names.slice().reverse().forEach(k => {
+    const s = styles[k] || { c: "var(--stone)", w: 1.4 };
+    const pts = data.series[k].map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+    g += `<polyline class="ln" points="${pts}" fill="none" stroke="${s.c}" stroke-width="${s.w}" ${s.d ? `stroke-dasharray="${s.d}"` : `pathLength="1"`} stroke-linejoin="round" stroke-linecap="round"/>`;
+  });
+  g += `<line id="cx" y1="${P.t}" y2="${H - P.b}" stroke="var(--faint)" stroke-width="1" opacity="0"/>`;
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}">${g}</svg><div class="tip"></div>`;
+  const svg = el.querySelector("svg"), tip = el.querySelector(".tip"), cx = el.querySelector("#cx");
+  svg.onmousemove = e => {
+    const r = svg.getBoundingClientRect(), sx = (e.clientX - r.left) / r.width * W;
+    const i = Math.max(0, Math.min(n - 1, Math.round((sx - P.l) / (W - P.l - P.r) * (n - 1))));
+    cx.setAttribute("x1", x(i)); cx.setAttribute("x2", x(i)); cx.setAttribute("opacity", 1);
+    tip.innerHTML = `<div class="muted" style="margin-bottom:6px">${fmtDate(data.dates[i], true)}</div>` +
+      names.map(k => `<div><span>${esc(k)}</span><b>${opts.fmt ? opts.fmt(data.series[k][i]) : nf0.format(data.series[k][i])}</b></div>`).join("");
+    const px = x(i) / W * r.width; tip.style.left = (px > r.width * .6 ? px - tip.offsetWidth - 14 : px + 14) + "px"; tip.style.top = "8px";
+    tip.classList.add("on");
+  };
+  svg.onmouseleave = () => { tip.classList.remove("on"); cx.setAttribute("opacity", 0); };
+}
+
+/* ---------- WebCrypto Decryption ---------- */
+function b64ToBuf(b64) {
+  const bin = atob(b64);
+  const buf = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+  return buf.buffer;
+}
+function bufToB64(buf) {
+  const bytes = new Uint8Array(buf);
+  let binary = "";
+  for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+  return btoa(binary);
+}
+
+async function deriveKey(password, saltBuffer) {
+  const enc = new TextEncoder();
+  const baseKey = await crypto.subtle.importKey(
+    "raw",
+    enc.encode(password),
+    "PBKDF2",
+    false,
+    ["deriveKey"]
+  );
+  return crypto.subtle.deriveKey(
+    {
+      name: "PBKDF2",
+      salt: saltBuffer,
+      iterations: 250000,
+      hash: "SHA-256"
+    },
+    baseKey,
+    { name: "AES-GCM", length: 256 },
+    true,
+    ["decrypt"]
+  );
+}
+
+async function decryptData(key, ivBuffer, dataBuffer) {
+  const decrypted = await crypto.subtle.decrypt(
+    { name: "AES-GCM", iv: ivBuffer },
+    key,
+    dataBuffer
+  );
+  return JSON.parse(new TextDecoder().decode(decrypted));
+}
+
+async function saveKey(key) {
+  try {
+    const raw = await crypto.subtle.exportKey("raw", key);
+    localStorage.setItem("mizan.panel_key", bufToB64(raw));
+  } catch (e) {}
+}
+
+async function getSavedKey() {
+  try {
+    const saved = localStorage.getItem("mizan.panel_key");
+    if (!saved) return null;
+    return await crypto.subtle.importKey(
+      "raw",
+      b64ToBuf(saved),
+      "AES-GCM",
+      true,
+      ["decrypt"]
+    );
+  } catch (e) {
+    return null;
+  }
+}
+
+/* ---------- Account Render ---------- */
+function modeSwitch() {
+  const modes = ["sanal", "gercek"].filter(m => S.state.accounts[m]);
+  if (modes.length < 2) return `<span class="eyebrow">${S.mode === "gercek" ? "Gerçek kasa" : "Sanal kasa"}</span>`;
+  return `<div class="seg" id="modeSeg">${modes.map(m => `<button data-m="${m}" class="${m === S.mode ? "on" : ""}">${m === "gercek" ? "Gerçek" : "Sanal"}</button>`).join("")}</div>`;
+}
+function bindModeSwitch() {
+  const el = $("#modeSeg"); if (el) el.onclick = e => { const m = e.target.dataset.m; if (m) { S.mode = m; render(); } };
+}
+
+function render() {
+  const el = $("#app");
+  const modes = ["sanal", "gercek"].filter(m => S.state.accounts[m]);
+  if (!modes.length) {
+    el.innerHTML = `<div class="card empty"><div class="serif">Henüz açık kasa yok.</div></div>`;
+    el.style.display = "block";
+    return;
+  }
+  if (!S.mode || !S.state.accounts[S.mode]) S.mode = modes.includes("gercek") ? "gercek" : modes[0];
+  const a = S.state.accounts[S.mode];
+  if (!a) return;
+  const real = S.mode === "gercek";
+  const cmp = [];
+  if (a.compare.gold != null) cmp.push(`Altın tutsaydın ${tl(a.compare.gold)}`);
+  if (a.compare.haven != null) cmp.push(`para fonunda ${tl(a.compare.haven)}`);
+  const status = a.started ? [`${a.start_text} tarihinden beri`, ...cmp].join(" · ") : `İlk işlemler ${a.start_text} açılışında.`;
+  const holds = a.holdings.map(h => `<div class="hold"><div class="sym">${esc(h.name)}${h.code ? `<span class="code">${esc(h.code)}</span>` : ""}</div>
+      <div class="val">${tl(h.value)}</div><div class="meter"><i style="width:${Math.max(h.weight, 0) * 100}%"></i></div>
+      <div class="sub">${pct(h.weight)}${h.qty ? " · " + esc(h.qty) : ""}</div></div>`).join("");
+  const cash = a.cash > 1 ? `<div class="hold"><div class="sym">Nakit</div><div class="val">${tl(a.cash)}</div>
+      <div class="meter"><i style="width:${a.cash / a.value * 100}%;background:var(--stone)"></i></div><div class="sub">${pct(a.cash / a.value)}</div></div>` : "";
+
+  const orderList = a.orders.map((o, i) => {
+    return `<div class="order ${real ? "with-tick" : ""} ${a.acked ? "done" : ""}" data-i="${i}">
+      ${real ? `<span class="tick"><svg viewBox="0 0 12 12"><path d="M2.5 6.2l2.3 2.3 4.7-4.9"/></svg></span>` : ""}
+      <span class="side ${o.side}">${o.side.toUpperCase()}</span>
+      <div><div class="code">${esc(o.code || o.name)}</div><div class="what">${esc(o.fund_title ? o.name + " · " + o.fund_title : o.name !== o.code ? o.name : "Hisse")}</div></div>
+      <div class="amt">${esc(o.amount)}${o.note ? `<small>${esc(o.note)}</small>` : ""}</div></div>`;
+  }).join("");
+
+  const nextCard = a.orders.length ? `<div class="card">
+      <div class="head"><div><h2>Sıradaki işlemler</h2>
+      <div class="muted small" style="margin-top:6px">${a.orders.length} işlem · ${real ? (a.acked ? "yapıldı olarak işaretlendi" : "bir sonraki açılışta senin vermen gerekiyor") : "bir sonraki açılışta"}</div></div>
+      ${real && a.acked ? `<span class="muted small">Yapıldı</span>` : ""}</div>
+      <div class="grid g2">${orderList}</div></div>` : "";
+
+  el.innerHTML = `
+    <div class="switch-row">${modeSwitch()}<span class="eyebrow">${esc(a.personality_name)}</span></div>
+    <div class="hero">
+      <div class="value" id="heroValue">${tl(a.value)}</div>
+      <div class="delta ${a.change >= 0 ? "up" : "down"}">${a.change >= 0 ? "+" : "-"}${tl(Math.abs(a.change))} · ${pct(a.change_pct, true)}</div>
+      <div class="status">${esc(status)}</div>
+    </div>
+    <div class="stack">
+      ${nextCard}
+      <div class="card"><div class="head"><h2>Elindekiler</h2><span class="muted small">Başlangıç ${tl(a.capital)}</span></div>
+        <div class="grid gauto">${holds || ""}${cash}</div></div>
+      ${a.chart ? `<div class="card"><div class="head"><h2>Seyir</h2><div class="seg" id="curSeg"><button data-c="tl" class="${S.cur === "tl" ? "on" : ""}">TL</button><button data-c="usd" class="${S.cur === "usd" ? "on" : ""}">Dolar</button></div></div>
+        <div class="chart" id="kChart"></div>${legend(STY, Object.keys(a.chart.tl))}</div>` : ""}
+    </div>
+    <footer class="meta"><span>Veriler ${esc(a.data_date)} kapanışına kadar</span><span>Sıradaki karar ${esc(a.next_decision)} akşamı</span></footer>`;
+  el.style.display = "block";
+  bindModeSwitch();
+  if (a.chart) {
+    drawChart($("#kChart"), { dates: a.chart.dates, series: a.chart[S.cur] }, STY, { fmt: S.cur === "usd" ? usd : v => nf0.format(v) });
+    $("#curSeg").onclick = e => { const c = e.target.dataset.c; if (c) { S.cur = c; render(); } };
+  }
+}
+
+function onSuccess(state) {
+  S.state = state;
+  $("#loginWrap").style.display = "none";
+  render();
+}
+
+async function init() {
+  const saltBuf = b64ToBuf(PAYLOAD.salt);
+  const ivBuf = b64ToBuf(PAYLOAD.iv);
+  const dataBuf = b64ToBuf(PAYLOAD.data);
+
+  const savedKey = await getSavedKey();
+  if (savedKey) {
+    try {
+      const state = await decryptData(savedKey, ivBuf, dataBuf);
+      onSuccess(state);
+      return;
+    } catch (e) {
+      try { localStorage.removeItem("mizan.panel_key"); } catch (err) {}
+    }
+  }
+
+  $("#loginForm").onsubmit = async (e) => {
+    e.preventDefault();
+    const pwdErr = $("#pwdErr");
+    pwdErr.textContent = "";
+    const pwd = $("#pwd").value;
+    if (!pwd) return;
+    const btn = $("#btnOpen");
+    btn.disabled = true;
+    try {
+      const key = await deriveKey(pwd, saltBuf);
+      const state = await decryptData(key, ivBuf, dataBuf);
+      await saveKey(key);
+      onSuccess(state);
+    } catch (err) {
+      pwdErr.textContent = "Şifre yanlış.";
+      btn.disabled = false;
+    }
+  };
+}
+
+init();
+</script>
+</body>
+</html>
